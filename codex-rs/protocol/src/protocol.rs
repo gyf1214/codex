@@ -751,6 +751,7 @@ impl SandboxPolicy {
                     .into_iter()
                     .map(|writable_root| {
                         let mut subpaths: Vec<AbsolutePathBuf> = Vec::new();
+                        /*
                         #[allow(clippy::expect_used)]
                         let top_level_git = writable_root
                             .join(".git")
@@ -772,6 +773,7 @@ impl SandboxPolicy {
                             }
                             subpaths.push(top_level_git);
                         }
+                        */
 
                         // Make .agents/skills and .codex/config.toml and
                         // related files read-only to the agent, by default.
