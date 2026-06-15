@@ -80,7 +80,7 @@ fn system_bwrap_launcher_for_path_with_probe(
 
     let Some(SystemBwrapCapabilities {
         supports_argv0,
-        supports_perms: true,
+        supports_perms: _,
     }) = system_bwrap_capabilities(system_bwrap_path)
     else {
         return None;

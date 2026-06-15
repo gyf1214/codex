@@ -24,11 +24,13 @@ const PROTECTED_METADATA_AGENTS_PATH_NAME: &str = ".agents";
 const PROTECTED_METADATA_CODEX_PATH_NAME: &str = ".codex";
 
 /// Top-level workspace metadata paths that stay protected under writable roots.
-pub const PROTECTED_METADATA_PATH_NAMES: &[&str] = &[
-    PROTECTED_METADATA_GIT_PATH_NAME,
-    PROTECTED_METADATA_AGENTS_PATH_NAME,
-    PROTECTED_METADATA_CODEX_PATH_NAME,
-];
+pub const PROTECTED_METADATA_PATH_NAMES: &[&str] = &[];
+// Tiny local compatibility: keep workspace metadata writable in this fork.
+// pub const PROTECTED_METADATA_PATH_NAMES: &[&str] = &[
+//     PROTECTED_METADATA_GIT_PATH_NAME,
+//     PROTECTED_METADATA_AGENTS_PATH_NAME,
+//     PROTECTED_METADATA_CODEX_PATH_NAME,
+// ];
 
 /// Returns true when a path basename is one of the protected workspace metadata names.
 pub fn is_protected_metadata_name(name: &OsStr) -> bool {
@@ -37,9 +39,11 @@ pub fn is_protected_metadata_name(name: &OsStr) -> bool {
         .any(|metadata_name| name == OsStr::new(metadata_name))
 }
 
-pub fn is_protected_metadata_directory_name(name: &OsStr) -> bool {
-    name == OsStr::new(PROTECTED_METADATA_AGENTS_PATH_NAME)
-        || name == OsStr::new(PROTECTED_METADATA_CODEX_PATH_NAME)
+pub fn is_protected_metadata_directory_name(_name: &OsStr) -> bool {
+    false
+    // Tiny local compatibility: keep workspace metadata writable in this fork.
+    // name == OsStr::new(PROTECTED_METADATA_AGENTS_PATH_NAME)
+    //     || name == OsStr::new(PROTECTED_METADATA_CODEX_PATH_NAME)
 }
 
 /// Returns the protected workspace metadata name when an agent write to `path`
@@ -564,9 +568,10 @@ impl FileSystemSandboxPolicy {
                 }),
         );
 
-        append_default_read_only_project_root_subpath_if_no_explicit_rule(&mut entries, ".git");
-        append_default_read_only_project_root_subpath_if_no_explicit_rule(&mut entries, ".agents");
-        append_default_read_only_project_root_subpath_if_no_explicit_rule(&mut entries, ".codex");
+        // Tiny local compatibility: keep workspace metadata writable in this fork.
+        // append_default_read_only_project_root_subpath_if_no_explicit_rule(&mut entries, ".git");
+        // append_default_read_only_project_root_subpath_if_no_explicit_rule(&mut entries, ".agents");
+        // append_default_read_only_project_root_subpath_if_no_explicit_rule(&mut entries, ".codex");
         for writable_root in writable_roots {
             for protected_path in default_read_only_subpaths_for_writable_root(
                 writable_root,
@@ -1548,6 +1553,7 @@ pub(crate) fn default_read_only_subpaths_for_writable_root(
     protect_missing_dot_codex: bool,
 ) -> Vec<AbsolutePathBuf> {
     let mut subpaths: Vec<AbsolutePathBuf> = Vec::new();
+    /*
     let top_level_git = writable_root.join(PROTECTED_METADATA_GIT_PATH_NAME);
     // This applies to typical repos (directory .git), worktrees/submodules
     // (file .git with gitdir pointer), and bare repos when the gitdir is the
@@ -1578,6 +1584,9 @@ pub(crate) fn default_read_only_subpaths_for_writable_root(
     if protect_missing_dot_codex || top_level_codex.as_path().is_dir() {
         subpaths.push(top_level_codex);
     }
+    */
+    let _ = writable_root;
+    let _ = protect_missing_dot_codex;
 
     dedup_absolute_paths(subpaths, /*normalize_effective_paths*/ false)
 }

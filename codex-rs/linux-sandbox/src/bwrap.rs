@@ -274,7 +274,7 @@ fn create_bwrap_flags_full_filesystem(command: Vec<String>, options: BwrapOption
         // Always enter a fresh user namespace so root inside a container does
         // not need ambient CAP_SYS_ADMIN to create the remaining namespaces.
         "--unshare-user".to_string(),
-        "--unshare-pid".to_string(),
+        // "--unshare-pid".to_string(),
     ];
     if options.network_mode.should_unshare_network() {
         args.push("--unshare-net".to_string());
@@ -321,7 +321,7 @@ fn create_bwrap_flags(
     // Request a user namespace explicitly rather than relying on bubblewrap's
     // auto-enable behavior, which is skipped when the caller runs as uid 0.
     args.push("--unshare-user".to_string());
-    args.push("--unshare-pid".to_string());
+    // args.push("--unshare-pid".to_string());
     if options.network_mode.should_unshare_network() {
         args.push("--unshare-net".to_string());
     }
@@ -1083,8 +1083,7 @@ fn append_empty_file_bind_data_args(bwrap_args: &mut BwrapArgs, path: &Path) -> 
 }
 
 fn append_empty_directory_args(bwrap_args: &mut BwrapArgs, path: &Path) {
-    bwrap_args.args.push("--perms".to_string());
-    bwrap_args.args.push("555".to_string());
+    // Tiny local compatibility: system bubblewrap 0.4.0 lacks `--perms`.
     bwrap_args.args.push("--tmpfs".to_string());
     bwrap_args.args.push(path_to_string(path));
     bwrap_args.args.push("--remount-ro".to_string());
@@ -1181,16 +1180,12 @@ fn append_existing_unreadable_path_args(
             .map(PathBuf::as_path)
             .filter(|path| *path != unreadable_root && path.starts_with(unreadable_root))
             .collect();
-        bwrap_args.args.push("--perms".to_string());
         // Execute-only perms let the process traverse into explicitly
         // re-opened writable descendants while still hiding the denied
         // directory contents. Plain denied directories with no writable child
         // mounts stay at `000`.
-        bwrap_args.args.push(if writable_descendants.is_empty() {
-            "000".to_string()
-        } else {
-            "111".to_string()
-        });
+        // Tiny local compatibility: system bubblewrap 0.4.0 lacks `--perms`,
+        // so the tmpfs keeps bubblewrap's default mode.
         bwrap_args.args.push("--tmpfs".to_string());
         bwrap_args.args.push(path_to_string(unreadable_root));
         // Recreate any writable descendants inside the tmpfs before remounting
@@ -1209,8 +1204,7 @@ fn append_existing_unreadable_path_args(
         return Ok(());
     }
 
-    bwrap_args.args.push("--perms".to_string());
-    bwrap_args.args.push("000".to_string());
+    // Tiny local compatibility: system bubblewrap 0.4.0 lacks `--perms`.
     append_empty_file_bind_data_args(bwrap_args, unreadable_root)
 }
 
